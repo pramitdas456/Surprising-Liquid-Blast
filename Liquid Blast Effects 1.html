@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprising Liquid Blast Effects</title>
+    <style>
+        *
+        {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1d2b3a;
+            overflow: hidden;
+            filter: url(#gooey);
+        }
+        .circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: conic-gradient(from 180deg, #ff47a1, #ffa52c, #4aeb34, #3dc9e0, #5d2586, #ff47a1);
+            animation: rotateGradient 12s linear infinite;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .circle:hover {
+            animation-play-state: paused;
+        }
+        .mini-circle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(90deg, #f98128, #5d2586);
+            border-radius: 50%;
+            animation: orbit 4s linear infinite;
+        }
+
+        .mini-circle:nth-child(1) { animation-delay: 0s; top: -30px; }
+        .mini-circle:nth-child(2) { animation-delay: 1s; right: -30px; }
+        .mini-circle:nth-child(3) { animation-delay: 2s; bottom: -30px; }
+        .mini-circle:nth-child(4) { animation-delay: 3s; left: -30px; }
+
+        @keyframes orbit {
+            0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+        }
+        @keyframes rotateGradient {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .particles
+        {
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        @keyframes animate
+        {
+            0%, 100%
+            {
+                transform: translate(0,0);
+            }
+            50%
+            {
+                transform: translate(var(--x),var(--y));
+            }
+        }
+        svg
+        {
+            width: 0;
+            height: 0;
+        }
+        .ripple {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(15);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="circle"></div>
+    <svg>
+        <filter id="gooey">
+           <feGaussianBlur in="SourceGraphic" stdDeviation="10"/>
+           <feColorMatrix values ="1 0 0 0 0
+                                   0 1 0 0 0
+                                   0 0 1 0 0
+                                   0 0 0 50 -10"/>
+        </filter>
+    </svg>
+
+    <!-- Add multiple audio elements for different sound effects -->
+    <audio id="sound1" src="audio/bubblepop-254773.mp3"></audio>
+    <audio id="sound2" src="audio/pop-1-35897.mp3"></audio>
+    <audio id="sound3" src="audio/pop-39222.mp3"></audio>
+    <audio id="sound4" src="audio/pop-94319.mp3"></audio>
+    <audio id="sound5" src="audio/happy-pop-1-185286.mp3"></audio>
+    <audio id="sound6" src="audio/happy-pop-2-185287.mp3"></audio>
+    <audio id="sound7" src="audio/happy-pop-3-185288.mp3"></audio>
+    <audio id="sound8" src="audio/multi-pop-1-188165.mp3"></audio>
+    <audio id="sound9" src="audio/bubble-pop-100784.mp3"></audio>
+    <audio id="sound10" src="audio/pick-92276.mp3"></audio>
+    <!-- Replace with the paths to your actual sound files -->
+
+    <script>
+        let circle = document.querySelector('.circle');
+
+        // Store the audio elements in an array
+        let sounds = [
+            document.getElementById('sound1'),
+            document.getElementById('sound2'),
+            document.getElementById('sound3'),
+            document.getElementById('sound4'),
+            document.getElementById('sound5'),
+            document.getElementById('sound6'),
+            document.getElementById('sound7'),
+            document.getElementById('sound8'),
+            document.getElementById('sound9'),
+            document.getElementById('sound10')
+        ];
+
+        // Define an array of colors to choose from
+        const colors = ['#f98128', '#5d2586', '#3dc9e0', '#ff47a1', '#ffa52c', '#4aeb34', '#ff3333'];
+
+        function triggerEffect() {
+            // Select a random sound from the array and play it
+            let randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+            randomSound.currentTime = 0; // Reset sound to start
+            randomSound.play();
+
+            for(let i = 0; i < 50; i++){
+                let particles = document.createElement('i');
+                particles.classList.add('particles');
+                
+                // Randomly select a color for each particle
+                let randomColor = colors[Math.floor(Math.random() * colors.length)];
+                particles.style.background = randomColor;
+
+                let randomX = (Math.random() - 0.5) * window.innerWidth;
+                let randomY = (Math.random() - 0.5) * window.innerHeight;
+
+                particles.style.setProperty('--x', randomX + 'px');
+                particles.style.setProperty('--y', randomY + 'px');
+
+                let randomSize = Math.random() * 60 + 10;
+                particles.style.width = randomSize + 'px';
+                particles.style.height = randomSize + 'px';
+
+                let duration = Math.random() * 3 + 2;
+                particles.style.animation = `animate ${duration}s ease forwards`;
+
+                document.body.appendChild(particles);
+
+                setTimeout(function(){
+                    particles.remove();
+                }, 5000);
+            }
+        }
+
+        // Trigger effect on circle click
+        circle.addEventListener('click', triggerEffect);
+
+        // Trigger effect on key press (spacebar or enter)
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' || event.code === 'Enter') {
+                triggerEffect();
+            }
+        });
+
+        circle.addEventListener('click', function(e) {
+            let ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            ripple.style.left = `${e.clientX - circle.offsetLeft}px`;
+            ripple.style.top = `${e.clientY - circle.offsetTop}px`;
+            circle.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    </script>
+</body>
+</html>
